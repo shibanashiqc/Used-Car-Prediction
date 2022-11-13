@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Car Prediction</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" />
+</head>
+<body>
+    
+    <script defer src="https://unpkg.com/alpinejs@3.10.2/dist/cdn.min.js"></script>
+
+
+    <!-- Create by joker banny -->
+<div class="h-screen bg-indigo-100 flex justify-center items-center">
+	<div class="lg:w-2/5 md:w-1/2 w-2/3">
+		<form class="bg-white p-10 rounded-lg shadow-lg min-w-full"  method="post" accept-charset="utf-8" name="Modelform">
+			<h1 class="text-center text-2xl mb-6 text-gray-600 font-bold font-sans">Welcome to Car Prediction </h1>
+			<div>
+        <label class="text-gray-800 font-semibold block my-3 text-md" for="">Company</label>
+        <select required class="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500" name="company" id="company" onchange="load_car_models(this.id,'car_models')">
+         {% for company in companies %}
+          <option value="{{company}}">{{company}}</option>
+         {% endfor %}
+    
+        </select>
+</div>
+        <div>
+            <label class="text-gray-800 font-semibold block my-3 text-md" for="">Model</label>
+            <select required="required" class="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500" name="car_models" id="car_models">
+            <!-- {% for model in car_models %}
+             <option value="{{model}}">{{model}}</option>
+            {% endfor %} -->
+           </select>
+      </div>
+
+
+      <div>
+        <label class="text-gray-800 font-semibold block my-3 text-md" for="">Year of Purchase</label>
+        <select  required class="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500" name="year" id="year">
+        {% for years in year %}
+         <option value="{{years}}">{{years}}</option>
+        {% endfor %}
+       </select>
+        </div>
+
+
+        <div>
+            <label class="text-gray-800 font-semibold block my-3 text-md" for="">Fuel Type</label>
+            <select  required class="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500" name="fuel_type" id="fuel_type">
+            {% for fuel in fuel_type %}
+             <option value="{{fuel}}">{{fuel}}</option>
+            {% endfor %}
+           </select>
+            </div>
+
+
+            <div>
+				<label class="text-gray-800 font-semibold block my-3 text-md" for="">Enter Kilometers travelled </label>
+				<input required class="w-full bg-gray-100 px-4 py-2 rounded-lg focus:outline-none" type="text" name="kilo_driven" id="kilo_driven" placeholder="23233" />
+      </div>
+               
+           
+                    <button type="button" onclick="send_data()" class="w-full mt-6 bg-indigo-600 rounded-lg px-4 py-2 text-lg text-white tracking-wide font-semibold font-sans">Submit </button>
+</form>
+     
+
+
+<div class="row">
+    <div class="col-12" style="text-align: center">
+        <h4><span id="prediction"></span></h4>
+    </div>
+</div>
+
+
+	</div>
+</div>
+
+
+<script>
+
+    function load_car_models(company_id,car_model_id)
+    {
+        var company=document.getElementById(company_id);
+        var car_model= document.getElementById(car_model_id);
+        console.log(company.value);
+        car_model.value="";
+        car_model.innerHTML="";
+        {% for company in companies %}
+            if( company.value == "{{ company }}")
+            {
+                {% for model in car_models %}
+                    {% if company in model %}
+
+                        var newOption= document.createElement("option");
+                        newOption.value="{{ model }}";
+                        newOption.innerHTML="{{ model }}";
+                        car_model.options.add(newOption);
+                    {% endif %}
+                {% endfor %}
+            }
+        {% endfor %}
+    }
+
+    function form_handler(event) {
+        event.preventDefault(); // Don't submit the form normally
+    }
+
+
+
+    function send_data()
+    {
+        
+        document.querySelector('form').addEventListener("submit",form_handler);
+
+        var fd=new FormData(document.querySelector('form'));
+
+        var xhr= new XMLHttpRequest({mozSystem: true});
+
+        xhr.open('POST','/predict',true);
+        document.getElementById('prediction').innerHTML="Wait! Predicting Price.....";
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState == XMLHttpRequest.DONE){
+                document.getElementById('prediction').innerHTML="Prediction: ₹"+xhr.responseText;
+
+            }
+        };
+
+        xhr.onload= function(){};
+
+        xhr.send(fd);
+    }
+
+    </script>
+
+</body>
+</html>
